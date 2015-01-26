@@ -71,9 +71,9 @@
 in PARAGRAPH if user-configurable variable ox-qmd-unfill-paragraph is non-nil."
   (if (and (org-export-derived-backend-p backend 'qmd)
            ox-qmd-unfill-paragraph)
-      (replace-regexp-in-string
-       "  \n" "\n" (replace-regexp-in-string
-                    "\\([^ ][^ ]\\)\n" "\\1" paragraph))
+      (concat (replace-regexp-in-string
+               "  \n" "\n" (replace-regexp-in-string
+                            "\\([^ ][^ ]\\)\n" "\\1" paragraph)) "\n")
     paragraph))
 
 

@@ -3,6 +3,9 @@
 ;; Copyright (C) 2015 0x60DF
 
 ;; Author: 0x60DF <0x60DF@gmail.com>
+;; URL: https://github.com/0x60df/ox-qmd
+;; Version: 1.0.0
+;; Package-Requires: ((org "8.0") (ox-md))
 ;; Keywords: org, wp, markdown, qiita
 
 ;; This file is not part of GNU Emacs.
@@ -33,7 +36,6 @@
 (require 'ox-md)
 
 
-
 ;;; User-Configurable Variables
 
 (defvar ox-qmd-language-keyword-alist '(("emacs-lisp" . "el")))
@@ -44,29 +46,29 @@
 ;;; Define Back-End
 
 (org-export-define-derived-backend 'qmd 'md
-  :filters-alist '((:filter-paragraph . org-qmd-unfill-paragraph))
+  :filters-alist '((:filter-paragraph . org-qmd--unfill-paragraph))
   :menu-entry
   '(?9 "Export to Qiita Markdown"
        ((?0 "To temporary buffer"
             (lambda (a s v b) (org-qmd-export-as-markdown a s v)))
-	(?9 "To file" (lambda (a s v b) (org-qmd-export-to-markdown a s v)))
-	(?o "To file and open"
-	    (lambda (a s v b)
-	      (if a (org-qmd-export-to-markdown t s v)
-		(org-open-file (org-qmd-export-to-markdown nil s v)))))
+        (?9 "To file" (lambda (a s v b) (org-qmd-export-to-markdown a s v)))
+        (?o "To file and open"
+            (lambda (a s v b)
+              (if a (org-qmd-export-to-markdown t s v)
+                (org-open-file (org-qmd-export-to-markdown nil s v)))))
         (?s "To temporary buffer from subtree"
-	    (lambda (a s v b) (org-qmd-export-as-markdown a t v)))))
-  :translate-alist '((headline . org-qmd-headline)
-                     (inner-template . org-qmd-inner-template)
-                     (keyword . org-qmd-keyword)
+            (lambda (a s v b) (org-qmd-export-as-markdown a t v)))))
+  :translate-alist '((headline . org-qmd--headline)
+                     (inner-template . org-qmd--inner-template)
+                     (keyword . org--qmd-keyword)
                      (strike-through . org-qmd-strike-through)
-		     (src-block . org-qmd-src-block)))
+                     (src-block . org-qmd--src-block)))
 
 
 
 ;;; Filters
 
-(defun org-qmd-unfill-paragraph (paragraph backend info)
+(defun org-qmd--unfill-paragraph (paragraph backend info)
   "Remove newline from PARAGRAPH and replace line-break string with newline
 in PARAGRAPH if user-configurable variable ox-qmd-unfill-paragraph is non-nil."
   (if (and (org-export-derived-backend-p backend 'qmd)
@@ -82,39 +84,39 @@ in PARAGRAPH if user-configurable variable ox-qmd-unfill-paragraph is non-nil."
 
 ;;;; Headline
 
-(defun org-qmd-headline (headline contents info)
+(defun org-qmd--headline (headline contents info)
   "Transcode HEADLINE element into Qiita Markdown format.
 CONTENTS is the headline contents.  INFO is a plist used as
 a communication channel."
-  (let* ((info (copy-list info))
+  (let* ((info (copy-sequence info))
          (info (plist-put info :with-toc nil)))
     (org-md-headline headline contents info)))
 
 
 ;;;; Template
 
-(defun org-qmd-inner-template (contents info)
+(defun org-qmd--inner-template (contents info)
   "Return body of document after converting it to Qiita Markdown syntax.
 CONTENTS is the transcoded contents string.  INFO is a plist
 holding export options."
-  (let* ((info (copy-list info))
+  (let* ((info (copy-sequence info))
          (info (plist-put info :with-toc nil)))
     (org-md-inner-template contents info)))
 
 
 ;;;; keyword
 
-(defun org-qmd-keyword (keyword contents info)
+(defun org-qmd--keyword (keyword contents info)
   "Transcode a KEYWORD element into Qiita Markdown format.
 CONTENTS is nil.  INFO is a plist holding contextual information."
-  (let* ((info (copy-list info))
+  (let* ((info (copy-sequence info))
          (info (plist-put info :with-toc nil)))
     (org-html-keyword keyword contents info)))
 
 
 ;;;; Src Block
 
-(defun org-qmd-src-block (src-block contents info)
+(defun org-qmd--src-block (src-block contents info)
   "Transcode SRC-BLOCK element into Qiita Markdown format.
 CONTENTS is nil.  INFO is a plist used as a communication
 channel."
@@ -129,8 +131,8 @@ channel."
 
 ;;;; Strike Through
 
-(defun org-gfm-strike-through (strike-through contents info)
-  (format "~~%s~~" contents))
+;; (defun org-gfm-strike-through (strike-through contents info)
+;;   (format "~~%s~~" contents))
 
 
 

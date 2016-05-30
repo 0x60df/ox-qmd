@@ -131,8 +131,8 @@ channel."
 
 ;;;; Strike Through
 
-;; (defun org-gfm-strike-through (strike-through contents info)
-;;   (format "~~%s~~" contents))
+(defun org-qmd-strike-through (strike-through contents info)
+  (format "~~%s~~" contents))
 
 
 

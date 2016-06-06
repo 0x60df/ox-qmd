@@ -1,11 +1,11 @@
 ;;; ox-qmd.el --- Qiita Markdown Back-End for Org Export Engine
 
-;; Copyright (C) 2015 0x60DF
+;; Copyright (C) 2015,2016 0x60DF
 
 ;; Author: 0x60DF <0x60DF@gmail.com>
 ;; URL: https://github.com/0x60df/ox-qmd
 ;; Version: 1.0.0
-;; Package-Requires: ((org "8.0") (ox-md))
+;; Package-Requires: ((org "8.0"))
 ;; Keywords: org, wp, markdown, qiita
 
 ;; This file is not part of GNU Emacs.

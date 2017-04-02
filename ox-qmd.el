@@ -202,8 +202,4 @@ Return output file's name."
 
 (provide 'ox-qmd)
 
-;; Local variables:
-;; generated-autoload-file: "org-loaddefs.el"
-;; End:
-
 ;;; ox-qmd.el ends here

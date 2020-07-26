@@ -4,7 +4,7 @@
 
 ;; Author: 0x60DF <0x60DF@gmail.com>
 ;; URL: https://github.com/0x60df/ox-qmd
-;; Version: 1.0.1
+;; Version: 1.0.2
 ;; Package-Requires: ((org "8.0"))
 ;; Keywords: org, wp, markdown, qiita
 
@@ -69,13 +69,16 @@
 ;;; Filters
 
 (defun org-qmd--unfill-paragraph (paragraph backend info)
-  "Remove newline from PARAGRAPH and replace line-break string with newline
-in PARAGRAPH if user-configurable variable ox-qmd-unfill-paragraph is non-nil."
+  "Unfill PARAGRAPH element.
+Remove newline from PARAGRAPH and replace line-break string
+with newline in PARAGRAPH if user-configurable variable
+`ox-qmd-unfill-paragraph' is non-nil."
   (if (and (org-export-derived-backend-p backend 'qmd)
            ox-qmd-unfill-paragraph)
       (concat (replace-regexp-in-string
                "  \n" "\n" (replace-regexp-in-string
-                            "\\([^ ][^ ]\\)\n" "\\1" paragraph)) "\n")
+                            "\\([^ ][^ ]\\|[^ ] \\| [^ ]\\)\n" "\\1" paragraph))
+              "\n")
     paragraph))
 
 

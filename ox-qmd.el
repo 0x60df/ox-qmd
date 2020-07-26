@@ -4,7 +4,7 @@
 
 ;; Author: 0x60DF <0x60DF@gmail.com>
 ;; URL: https://github.com/0x60df/ox-qmd
-;; Version: 1.0.4
+;; Version: 1.0.5
 ;; Package-Requires: ((org "8.0"))
 ;; Keywords: org, wp, markdown, qiita
 
@@ -65,7 +65,8 @@
                      (underline . org-qmd--undeline)
                      (src-block . org-qmd--src-block)
                      (latex-fragment . org-qmd--latex-fragment)
-                     (latex-environment . org-qmd--latex-environment)))
+                     (latex-environment . org-qmd--latex-environment)
+                     (table . org-qmd--table)))
 
 
 
@@ -182,6 +183,81 @@ channel."
     (let* ((info (copy-sequence info))
            (info (plist-put info :with-latex 'verbatim)))
       (org-html-latex-environment latex-environment contents info)))))
+
+
+;;;; Table
+
+(defun org-qmd--table (table contents info)
+  "Transcode a TABLE element into Qiita Markdown format.
+CONTENTS is a content of the table. INFO is a plist used as
+a communication channel."
+  (letrec ((filter (lambda (p l)
+                     (cond ((null l) l)
+                           ((funcall p (car l)) (funcall filter p (cdr l)))
+                           (t (cons (car l) (funcall filter p (cdr l)))))))
+           (zip (lambda (&rest l)
+                  (cond ((null (car l)) (car l))
+                        (t (cons (mapcar 'car l)
+                                 (apply zip (mapcar 'cdr l))))))))
+    (let* ((rows (org-element-map table 'table-row 'identity info))
+           (non-rule-rows
+            (funcall filter (lambda (row)
+                              (eq 'rule (org-element-property :type row)))
+                     rows))
+           (alignments (org-element-map (car non-rule-rows) 'table-cell
+                         (lambda (cell)
+                           (org-export-table-cell-alignment cell info))
+                         info))
+           (widths (mapcar
+                    (lambda (column)
+                      (let ((max-difference
+                             (apply
+                              'max (mapcar
+                                    (lambda (cell)
+                                      (- (org-element-property :end cell)
+                                         (org-element-property :begin cell)))
+                                    column))))
+                        (if (< max-difference 4) 3 (- max-difference 1))))
+                    (apply
+                     zip (mapcar
+                          (lambda (row)
+                            (org-element-map row 'table-cell 'identity info))
+                          non-rule-rows))))
+           (joined-rows
+            (mapcar (lambda (row)
+                      (let ((cells
+                             (org-element-map row 'table-cell 'identity info)))
+                        (mapconcat
+                         (lambda (tuple)
+                           (let ((alignment (car tuple))
+                                 (width (cadr tuple))
+                                 (cell (caddr tuple)))
+                             (format (format " %%-%ds" (- width 1))
+                                     (or (org-export-data
+                                          (org-element-contents cell)
+                                          info)
+                                         ""))))
+                         (funcall zip alignments widths cells)
+                         "|")))
+                    non-rule-rows))
+           (joined-rows-with-delimiter-row
+            (cons (car joined-rows)
+                  (cons (mapconcat
+                         (lambda (tuple)
+                           (let ((alignment (car tuple))
+                                 (width (cadr tuple)))
+                             (format "%s%s%s"
+                                     (if (memq alignment '(left center))
+                                         ":" "-")
+                                     (make-string (- width 2) ?-)
+                                     (if (memq alignment '(right center))
+                                         ":" "-"))))
+                         (funcall zip alignments widths)
+                         "|")
+                        (cdr joined-rows)))))
+      (mapconcat (lambda (row) (format "|%s|" row))
+                 joined-rows-with-delimiter-row
+                 "\n"))))
 
 
 

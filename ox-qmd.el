@@ -4,7 +4,7 @@
 
 ;; Author: 0x60DF <0x60DF@gmail.com>
 ;; URL: https://github.com/0x60df/ox-qmd
-;; Version: 1.0.3
+;; Version: 1.0.4
 ;; Package-Requires: ((org "8.0"))
 ;; Keywords: org, wp, markdown, qiita
 
@@ -63,7 +63,9 @@
                      (keyword . org--qmd-keyword)
                      (strike-through . org-qmd--strike-through)
                      (underline . org-qmd--undeline)
-                     (src-block . org-qmd--src-block)))
+                     (src-block . org-qmd--src-block)
+                     (latex-fragment . org-qmd--latex-fragment)
+                     (latex-environment . org-qmd--latex-environment)))
 
 
 
@@ -150,6 +152,36 @@ used as a communication channel."
 CONTENTS is a content of the UNDELINE. INFO is a plist used
 as a communication channel."
   contents)
+
+
+;;;; LaTeX fragment
+
+(defun org-qmd--latex-fragment (latex-fragment contents info)
+  "Transcode a LATEX-FRAGMENT element into Qiita Markdown format.
+CONTENTS is nil. INFO is a plist used as a communication
+channel."
+  (replace-regexp-in-string
+   "^\\\\(\\(.+\\)\\\\)$" "$\\1$"
+   (replace-regexp-in-string
+    "^\\\\\\[\\(.+\\)\\\\\\]$" "$$\\1$$"
+    (let* ((info (copy-sequence info))
+           (info (plist-put info :with-latex 'verbatim)))
+      (org-html-latex-fragment latex-fragment contents info)))))
+
+
+;;;; LaTeX environment
+
+(defun org-qmd--latex-environment (latex-environment contents info)
+  "Transcode a LATEX-ENVIRONMENT element into Qiita Markdown format.
+CONTENTS is nil. INFO is a plist used as a communication
+channel."
+  (replace-regexp-in-string
+   "^.*?\\\\begin{.+}.*?$" "```math"
+   (replace-regexp-in-string
+    "^.*?\\\\end{.+}.*?$" "```"
+    (let* ((info (copy-sequence info))
+           (info (plist-put info :with-latex 'verbatim)))
+      (org-html-latex-environment latex-environment contents info)))))
 
 
 

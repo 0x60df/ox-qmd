@@ -4,7 +4,7 @@
 
 ;; Author: 0x60DF <0x60DF@gmail.com>
 ;; URL: https://github.com/0x60df/ox-qmd
-;; Version: 1.0.2
+;; Version: 1.0.3
 ;; Package-Requires: ((org "8.0"))
 ;; Keywords: org, wp, markdown, qiita
 
@@ -62,6 +62,7 @@
                      (inner-template . org-qmd--inner-template)
                      (keyword . org--qmd-keyword)
                      (strike-through . org-qmd--strike-through)
+                     (underline . org-qmd--undeline)
                      (src-block . org-qmd--src-block)))
 
 
@@ -140,6 +141,15 @@ channel."
 CONTENTS is a content of the STRIKE-THROUGH. INFO is a plist
 used as a communication channel."
   (format "~~%s~~" contents))
+
+
+;;;; Underline
+
+(defun org-qmd--undeline (underline contents info)
+  "Transcode UNDERLINE element into Qiita Markdown format.
+CONTENTS is a content of the UNDELINE. INFO is a plist used
+as a communication channel."
+  contents)
 
 
 

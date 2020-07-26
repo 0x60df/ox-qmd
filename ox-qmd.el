@@ -89,8 +89,8 @@ with newline in PARAGRAPH if user-configurable variable
 
 (defun org-qmd--headline (headline contents info)
   "Transcode HEADLINE element into Qiita Markdown format.
-CONTENTS is the headline contents.  INFO is a plist used as
-a communication channel."
+CONTENTS is a content of the HEADLINE. INFO is a plist used
+as a communication channel."
   (let* ((info (copy-sequence info))
          (info (plist-put info :with-toc nil)))
     (org-md-headline headline contents info)))
@@ -100,7 +100,7 @@ a communication channel."
 
 (defun org-qmd--inner-template (contents info)
   "Return body of document after converting it to Qiita Markdown syntax.
-CONTENTS is the transcoded contents string.  INFO is a plist
+CONTENTS is the transcoded contents string. INFO is a plist
 holding export options."
   (let* ((info (copy-sequence info))
          (info (plist-put info :with-toc nil)))
@@ -111,7 +111,8 @@ holding export options."
 
 (defun org-qmd--keyword (keyword contents info)
   "Transcode a KEYWORD element into Qiita Markdown format.
-CONTENTS is nil.  INFO is a plist holding contextual information."
+CONTENTS is nil. INFO is a plist used as a communication
+channel."
   (let* ((info (copy-sequence info))
          (info (plist-put info :with-toc nil)))
     (org-html-keyword keyword contents info)))
@@ -121,7 +122,7 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
 
 (defun org-qmd--src-block (src-block contents info)
   "Transcode SRC-BLOCK element into Qiita Markdown format.
-CONTENTS is nil.  INFO is a plist used as a communication
+CONTENTS is nil. INFO is a plist used as a communication
 channel."
   (let* ((lang (org-element-property :language src-block))
          (lang (or (cdr (assoc lang ox-qmd-language-keyword-alist)) lang))
@@ -137,7 +138,7 @@ channel."
 (defun org-qmd--strike-through (strike-through contents info)
   "Transcode STRIKE-THROUGH element into Qiita Markdown format.
 CONTENTS is a content of the STRIKE-THROUGH. INFO is a plist
-holding contextual information."
+used as a communication channel."
   (format "~~%s~~" contents))
 
 
@@ -148,35 +149,36 @@ holding contextual information."
 (defun org-qmd-export-as-markdown (&optional async subtreep visible-only)
   "Export current buffer to a Qiita Markdown buffer.
 
-If narrowing is active in the current buffer, only export its
-narrowed part.
+If narrowing is active in the current buffer, only export
+its narrowed part.
 
 If a region is active, export that region.
 
-A non-nil optional argument ASYNC means the process should happen
-asynchronously.  The resulting buffer should be accessible
-through the `org-export-stack' interface.
+A non-nil optional argument ASYNC means the process should
+happen asynchronously. The resulting buffer should be
+accessible through the `org-export-stack' interface.
 
-When optional argument SUBTREEP is non-nil, export the sub-tree
-at point, extracting information from the headline properties
-first.
+When optional argument SUBTREEP is non-nil, export the
+sub-tree at point, extracting information from the headline
+properties first.
 
 When optional argument VISIBLE-ONLY is non-nil, don't export
 contents of hidden elements.
 
-Export is done in a buffer named \"*Org QMD Export*\", which will
-be displayed when `org-export-show-temporary-export-buffer' is
-non-nil."
+Export is done in a buffer named \"*Org QMD Export*\", which
+will be displayed when
+`org-export-show-temporary-export-buffer' is non-nil."
   (interactive)
   (org-export-to-buffer 'qmd "*Org QMD Export*"
     async subtreep visible-only nil nil (lambda () (text-mode))))
 
 ;;;###autoload
 (defun org-qmd-convert-region-to-md ()
-  "Assume the current region has org-mode syntax, and convert it to
-Qiita Markdown. This can be used in any buffer.  For example, you can write an
-itemized list in org-mode syntax in a Markdown buffer and use
-this command to convert it."
+  "Convert region into Qiita Markdown format.
+Assume the current region has org-mode syntax, and convert
+it to Qiita Markdown. This can be used in any buffer. For
+example, you can write an itemized list in org-mode syntax
+in a Markdown buffer and use this command to convert it."
   (interactive)
   (org-export-replace-region-by 'qmd))
 
@@ -185,18 +187,18 @@ this command to convert it."
 (defun org-qmd-export-to-markdown (&optional async subtreep visible-only)
   "Export current buffer to a Qiita Markdown file.
 
-If narrowing is active in the current buffer, only export its
-narrowed part.
+If narrowing is active in the current buffer, only export
+its narrowed part.
 
 If a region is active, export that region.
 
-A non-nil optional argument ASYNC means the process should happen
-asynchronously.  The resulting file should be accessible through
-the `org-export-stack' interface.
+A non-nil optional argument ASYNC means the process should
+happen asynchronously. The resulting file should be
+accessible through the `org-export-stack' interface.
 
-When optional argument SUBTREEP is non-nil, export the sub-tree
-at point, extracting information from the headline properties
-first.
+When optional argument SUBTREEP is non-nil, export the
+sub-tree at point, extracting information from the headline
+properties first.
 
 When optional argument VISIBLE-ONLY is non-nil, don't export
 contents of hidden elements.

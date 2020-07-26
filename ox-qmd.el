@@ -1,10 +1,10 @@
 ;;; ox-qmd.el --- Qiita Markdown Back-End for Org Export Engine
 
-;; Copyright (C) 2015,2016 0x60DF
+;; Copyright (C) 2015-2020 0x60DF
 
 ;; Author: 0x60DF <0x60DF@gmail.com>
 ;; URL: https://github.com/0x60df/ox-qmd
-;; Version: 1.0.0
+;; Version: 1.0.1
 ;; Package-Requires: ((org "8.0"))
 ;; Keywords: org, wp, markdown, qiita
 
@@ -61,7 +61,7 @@
   :translate-alist '((headline . org-qmd--headline)
                      (inner-template . org-qmd--inner-template)
                      (keyword . org--qmd-keyword)
-                     (strike-through . org-qmd-strike-through)
+                     (strike-through . org-qmd--strike-through)
                      (src-block . org-qmd--src-block)))
 
 
@@ -131,7 +131,10 @@ channel."
 
 ;;;; Strike Through
 
-(defun org-qmd-strike-through (strike-through contents info)
+(defun org-qmd--strike-through (strike-through contents info)
+  "Transcode STRIKE-THROUGH element into Qiita Markdown format.
+CONTENTS is a content of the STRIKE-THROUGH. INFO is a plist
+holding contextual information."
   (format "~~%s~~" contents))
 
 

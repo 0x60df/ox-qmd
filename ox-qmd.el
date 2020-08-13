@@ -89,8 +89,6 @@ with newline in PARAGRAPH if user-configurable variable
 
 ;;; Transcode Functions
 
-;;;; Headline
-
 (defun org-qmd--headline (headline contents info)
   "Transcode HEADLINE element into Qiita Markdown format.
 CONTENTS is a content of the HEADLINE. INFO is a plist used
@@ -99,8 +97,6 @@ as a communication channel."
          (info (plist-put info :with-toc nil)))
     (org-md-headline headline contents info)))
 
-
-;;;; Template
 
 (defun org-qmd--inner-template (contents info)
   "Return body of document after converting it to Qiita Markdown syntax.
@@ -111,8 +107,6 @@ holding export options."
     (org-md-inner-template contents info)))
 
 
-;;;; keyword
-
 (defun org-qmd--keyword (keyword contents info)
   "Transcode a KEYWORD element into Qiita Markdown format.
 CONTENTS is nil. INFO is a plist used as a communication
@@ -121,8 +115,6 @@ channel."
          (info (plist-put info :with-toc nil)))
     (org-html-keyword keyword contents info)))
 
-
-;;;; Src Block
 
 (defun org-qmd--src-block (src-block contents info)
   "Transcode SRC-BLOCK element into Qiita Markdown format.
@@ -137,8 +129,6 @@ channel."
     (concat prefix code suffix)))
 
 
-;;;; Strike Through
-
 (defun org-qmd--strike-through (strike-through contents info)
   "Transcode STRIKE-THROUGH element into Qiita Markdown format.
 CONTENTS is a content of the STRIKE-THROUGH. INFO is a plist
@@ -146,16 +136,12 @@ used as a communication channel."
   (format "~~%s~~" contents))
 
 
-;;;; Underline
-
 (defun org-qmd--undeline (underline contents info)
   "Transcode UNDERLINE element into Qiita Markdown format.
 CONTENTS is a content of the UNDELINE. INFO is a plist used
 as a communication channel."
   contents)
 
-
-;;;; LaTeX fragment
 
 (defun org-qmd--latex-fragment (latex-fragment contents info)
   "Transcode a LATEX-FRAGMENT element into Qiita Markdown format.
@@ -170,8 +156,6 @@ channel."
       (org-html-latex-fragment latex-fragment contents info)))))
 
 
-;;;; LaTeX environment
-
 (defun org-qmd--latex-environment (latex-environment contents info)
   "Transcode a LATEX-ENVIRONMENT element into Qiita Markdown format.
 CONTENTS is nil. INFO is a plist used as a communication
@@ -184,8 +168,6 @@ channel."
            (info (plist-put info :with-latex 'verbatim)))
       (org-html-latex-environment latex-environment contents info)))))
 
-
-;;;; Table
 
 (defun org-qmd--table (table contents info)
   "Transcode a TABLE element into Qiita Markdown format.

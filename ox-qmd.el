@@ -6,7 +6,7 @@
 ;; URL: https://github.com/0x60df/ox-qmd
 ;; Version: 1.0.5
 ;; Package-Requires: ((org "8.0"))
-;; Keywords: org, wp, markdown, qiita
+;; Keywords: wp
 
 ;; This file is not part of GNU Emacs.
 

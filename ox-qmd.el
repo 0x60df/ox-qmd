@@ -35,11 +35,25 @@
 
 (require 'ox-md)
 
+(defgroup org-export-qmd nil
+  "Qiita Markdown Back-End for Org Export Engine."
+  :group 'org-export)
+
+
 
 ;;; User-Configurable Variables
 
-(defvar ox-qmd-language-keyword-alist '(("emacs-lisp" . "el")))
-(defvar ox-qmd-unfill-paragraph t)
+(defcustom ox-qmd-language-keyword-alist '(("emacs-lisp" . "el"))
+  "Alist of language keyword association between org and qiita md.
+Elements are looks like (emacs-mode-name . qiita-markdown-keyword)"
+  :type '(alist :key-type string :value-type string)
+  :group 'org-export-qmd)
+
+(defcustom ox-qmd-unfill-paragraph t
+  "Flag for unfill paragraph.
+When non-nil, `ox-qmd' do unfill paragraph"
+  :type 'boolean
+  :group 'org-export-qmd)
 
 
 

@@ -8,14 +8,20 @@ and [Github Flavored Markdown](http://github.com/larstvei/ox-gfm) back-end.
 
 ## Requirements
 
--   Emacs 24
+-   Emacs 24.4
 -   Org-mode 8.0
 
 ## Installation
 
-1.  Copy ox-qmd.el to the directory which is listed in your `load-path` .
+### package.el
+
+ox-qmd is included in [MELPA](https://melpa.org/).
+
+### Manual install
+
+1.  Copy ox-qmd.el to the directory which is listed in your `load-path`.
 2.  Add the following code to your `.emacs` file.
-    
+
     ```emacs-lisp
     (require 'ox-qmd)
     ```

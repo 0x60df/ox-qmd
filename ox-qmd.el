@@ -228,7 +228,10 @@ a communication channel."
                            (let ((alignment (car tuple))
                                  (width (cadr tuple))
                                  (cell (caddr tuple)))
-                             (format (format " %%-%ds" (- width 1))
+                             (format (format (if (eq alignment 'right)
+                                                 "%%%ds "
+                                               " %%-%ds")
+                                             (- width 1))
                                      (or (org-export-data
                                           (org-element-contents cell)
                                           info)

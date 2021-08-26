@@ -1,15 +1,8 @@
-
-
 # ox-qmd.el
 
 Markdown ([qiita flavor](http://qiita.com/Qiita/items/c686397e4a0f4f11683d)) export back-end for GNU Emacs Org-mode.
-This back-end is based on Markdown back-end (part of GNU Emacs24)
+This back-end is based on Markdown back-end (part of GNU Emacs)
 and [Github Flavored Markdown](http://github.com/larstvei/ox-gfm) back-end.
-
-## Requirements
-
--   Emacs 24.4
--   Org-mode 8.0
 
 ## Installation
 

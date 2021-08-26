@@ -1,5 +1,7 @@
 # ox-qmd.el
 
+[![MELPA](https://melpa.org/packages/ox-qmd-badge.svg)](https://melpa.org/#/ox-qmd)
+
 Markdown ([qiita flavor](http://qiita.com/Qiita/items/c686397e4a0f4f11683d)) export back-end for GNU Emacs Org-mode.
 This back-end is based on Markdown back-end (part of GNU Emacs)
 and [Github Flavored Markdown](http://github.com/larstvei/ox-gfm) back-end.

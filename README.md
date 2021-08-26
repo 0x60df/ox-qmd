@@ -10,19 +10,15 @@ and [Github Flavored Markdown](http://github.com/larstvei/ox-gfm) back-end.
 
 ### package.el
 
-ox-qmd is included in [MELPA](https://melpa.org/).
-Install by using `package.el`, and add the following lines to your init file
-like `init.el` or `.emacs`.
-
-```emacs-lisp
-(with-eval-after-load 'ox
-  (require 'ox-qmd))
-```
+ox-qmd is included in [MELPA](https://melpa.org/#/ox-qmd).
 
 ### Manual install
 
-1.  Copy ox-qmd.el to the directory which is listed in your `load-path`.
-2.  Add the following code to your init file.
+Copy ox-qmd.el to the directory which is listed in your `load-path`.
+
+## Setup
+
+Add the following line to your init file like `init.el` or `.emacs`.
 
 ```emacs-lisp
 (require 'ox-qmd)

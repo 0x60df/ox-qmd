@@ -33,9 +33,12 @@
 ;; This library depends on NON-PUBLIC API of Qiita,
 ;; thus this library may cease to work without notice.
 
+;; Autoloads for this library are not offered.
+;; Use (require 'ox-qmd-upload-inline-image) to setup.
+
 ;; To upload images, call `ox-qmd-upload-inline-image'.
 ;; It scans buffer and try to upload all detected inline images.
-;; The command above is also called via org-mode export menu.
+;; The command above can also be called via org-mode export menu.
 
 ;; URL of uploaded images are stored in a comment line in a buffer:
 ;;   # ox-qmd-upload-inline-image: (("local-link" . "URL") ...)
@@ -43,7 +46,7 @@
 ;; like above, and transcode inline images as replacing local-link
 ;; to URL.
 ;; Cdr of each element can be a string of URL or a list whose car is
-;; is a string of URL and cadr is a string of alternative text:
+;; a string of URL and cadr is a string of alternative text:
 ;;   # ox-qmd-upload-inline-image: (("local-link" "URL" "alt") ...)
 ;; The comment line can be located at any position in a buffer.
 ;; Buffer can contain multiple comment lines but only first one is

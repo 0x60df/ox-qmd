@@ -280,43 +280,50 @@ ORG-BUFFER is a buffer object or buffer name."
       (add-variable-watcher 'ox-qmd-upload-inline-image--uploaded-stack watcher)
       (dolist (path not-uploaded-uniq-path-list)
         (ox-qmd-upload-inline-image--do-upload path))
-      (make-thread
-       (lambda ()
-         (with-mutex mutex
-           (while (not cond-notified)
-             (condition-wait cond-var)))
-         (let (path-url-alist)
-           (dolist (path not-uploaded-uniq-path-list)
-             (let ((cell (assoc path
-                                ox-qmd-upload-inline-image--uploaded-stack)))
-               (when cell
-                 (push cell path-url-alist)
-                 (setq ox-qmd-upload-inline-image--uploaded-stack
-                       (assoc-delete-all
-                        path
-                        ox-qmd-upload-inline-image--uploaded-stack)))))
-           (setq path-url-alist (reverse path-url-alist))
-           (let ((image-url-alist
-                  (mapcar (lambda (image-path)
-                            (cons (car image-path)
-                                  (cdr (assoc (cdr image-path)
-                                              path-url-alist))))
-                          (seq-filter (lambda (image-path)
-                                        (assoc (cdr image-path) path-url-alist))
-                                      image-path-alist))))
-             (if image-url-alist
-                 (with-current-buffer org-buffer
-                   (save-excursion
-                     (goto-char 1)
-                     (let ((updated-url
-                            (prin1-to-string
-                             (append existing-url-alist image-url-alist))))
-                       (if (re-search-forward
-                            ox-qmd-upload-inline-image--url-data-regexp nil t)
-                           (replace-match updated-url nil nil nil 1)
-                         (goto-char (point-max))
-                         (insert "\n# ox-qmd-upload-inline-image: "
-                                 updated-url)))))))))))))
+      (let* ((pop-stack-and-insert-to-buffer
+              (lambda ()
+                (let (path-url-alist)
+                  (dolist (path not-uploaded-uniq-path-list)
+                    (let ((cell
+                           (assoc path
+                                  ox-qmd-upload-inline-image--uploaded-stack)))
+                      (when cell
+                        (push cell path-url-alist)
+                        (setq ox-qmd-upload-inline-image--uploaded-stack
+                              (assoc-delete-all
+                               path
+                               ox-qmd-upload-inline-image--uploaded-stack)))))
+                  (setq path-url-alist (reverse path-url-alist))
+                  (let ((image-url-alist
+                         (mapcar (lambda (image-path)
+                                   (cons (car image-path)
+                                         (cdr (assoc (cdr image-path)
+                                                     path-url-alist))))
+                                 (seq-filter (lambda (image-path)
+                                               (assoc (cdr image-path)
+                                                      path-url-alist))
+                                             image-path-alist))))
+                    (if image-url-alist
+                        (with-current-buffer org-buffer
+                          (save-excursion
+                            (goto-char 1)
+                            (let ((updated-url
+                                   (prin1-to-string
+                                    (append existing-url-alist
+                                            image-url-alist))))
+                              (if (re-search-forward
+                                   ox-qmd-upload-inline-image--url-data-regexp
+                                   nil t)
+                                  (replace-match updated-url nil nil nil 1)
+                                (goto-char (point-max))
+                                (insert "\n# ox-qmd-upload-inline-image: "
+                                        updated-url)))))))))))
+        (make-thread
+         (lambda ()
+           (with-mutex mutex
+             (while (not cond-notified)
+               (condition-wait cond-var)))
+           (funcall pop-stack-and-insert-to-buffer)))))))
 
 (defun org-qmd--link-suppoting-image-upload (link desc info)
   "Transcode LINK element with support for image upload.

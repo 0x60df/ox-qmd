@@ -83,6 +83,17 @@ the results of upload are stopped and cleaned."
   :group 'org-export-qmd
   :type 'boolean)
 
+(defcustom ox-qmd-upload-inline-image-file-name-as-alt nil
+  "Flag if file name of inline image is used for alternative text.
+Extension of file name is striped.
+If the value of this option is nil, constant keyword img
+is used for alternative text.
+Even while the value of this option is non-nil, if stored
+URL has an alternative text in comment line, that is used
+for alternative text."
+  :group 'org-export-qmd
+  :type 'boolean)
+
 (defun ox-qmd-upload-inline-image--find-inline-images (org-buffer)
   "Return list of inline images of ORG-BUFFER.
 ORG-BUFFER is a buffer object or buffer name."
@@ -376,7 +387,12 @@ channel."
               (let ((replaced (replace-match url nil t uploaded 2)))
                 (if (stringp alt)
                     (replace-match alt nil t replaced 1)
-                  replaced))
+                  (if ox-qmd-upload-inline-image-file-name-as-alt
+                      (replace-match
+                       (file-name-sans-extension
+                        (file-name-nondirectory image))
+                       nil t replaced 1)
+                    replaced)))
             uploaded))
       standard)))
 

@@ -335,7 +335,7 @@ ORG-BUFFER is a buffer object or buffer name."
                               (if (re-search-forward
                                    ox-qmd-upload-inline-image--url-data-regexp
                                    nil t)
-                                  (replace-match updated-url nil nil nil 1)
+                                  (replace-match updated-url nil t nil 1)
                                 (goto-char (point-max))
                                 (insert "\n# ox-qmd-upload-inline-image: "
                                         updated-url))))))))))

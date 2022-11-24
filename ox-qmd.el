@@ -77,6 +77,7 @@ When non-nil, `ox-qmd' do unfill paragraph"
                      (underline . org-qmd--undeline)
                      (special-block . org-qmd--special-block)
                      (src-block . org-qmd--src-block)
+                     (link . org-qmd--link)
                      (latex-fragment . org-qmd--latex-fragment)
                      (latex-environment . org-qmd--latex-environment)
                      (table . org-qmd--table)))
@@ -151,6 +152,13 @@ channel."
     (if label
         (format ":::%s\n%s:::\n" label contents)
       (org-md--convert-to-html special-block contents info))))
+
+(defun org-qmd--link (link desc info)
+  "Transcode LINK element into Qiita Markdown format.
+DESC is nil.  INFO is a plist used as a communication
+channel."
+  (org-md-link link desc info))
+
 
 (defun org-qmd--strike-through (_strike-through contents _info)
   "Transcode STRIKE-THROUGH element into Qiita Markdown format.

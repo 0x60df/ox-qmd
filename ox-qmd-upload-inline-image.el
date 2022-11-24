@@ -304,7 +304,7 @@ ORG-BUFFER is a buffer object or buffer name."
                           (seq-filter (lambda (image-path)
                                         (assoc (cdr image-path) path-url-alist))
                                       image-path-alist))))
-             (if not-uploaded-uniq-path-list
+             (if image-url-alist
                  (with-current-buffer org-buffer
                    (save-excursion
                      (goto-char 1)

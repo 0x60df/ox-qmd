@@ -367,6 +367,38 @@ ORG-BUFFER is a buffer object or buffer name."
                thread
                pop-stack-and-insert-to-buffer))))))
 
+(defun ox-qmd-upload-inline-image-cleanup-url (org-buffer)
+  "Cleanup URL of which local image link does not exist on ORG-BUFFER."
+  (interactive
+   (list (if current-prefix-arg
+             (read-buffer "Buffer to cleanup URL: "
+                          nil t
+                          (lambda (buffer-name)
+                            (eq (buffer-local-value 'major-mode
+                                                    (get-buffer
+                                                     (if (consp buffer-name)
+                                                         (car buffer-name)
+                                                       buffer-name)))
+                                #'org-mode)))
+           (if (eq major-mode #'org-mode)
+               (current-buffer)))))
+  (let* ((existing-url-alist (ox-qmd-upload-inline-image--read-url-data
+                              org-buffer))
+         (existing-inline-images (ox-qmd-upload-inline-image--find-inline-images
+                                  org-buffer))
+         (valid-url-alist (seq-filter (lambda (image-url)
+                                        (member (car image-url)
+                                                existing-inline-images))
+                                      existing-url-alist)))
+    (if valid-url-alist
+        (with-current-buffer org-buffer
+          (save-excursion
+            (goto-char 1)
+            (if (re-search-forward
+                 ox-qmd-upload-inline-image--url-data-regexp nil t)
+                (replace-match (prin1-to-string valid-url-alist)
+                               nil t nil 1)))))))
+
 (defun org-qmd--link-suppoting-image-upload (link desc info)
   "Transcode LINK element with support for image upload.
 DESC is nil.  INFO is a plist used as a communication

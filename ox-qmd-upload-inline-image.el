@@ -71,6 +71,13 @@ Qiita/Qiita Team"
   :group 'org-export-qmd
   :type 'string)
 
+(defcustom ox-qmd-upload-inline-image-time-limit 30.0
+  "Time in second to quit handling the results of upload.
+When this time is spent, auxiliary facilities for handling
+the results of upload are stopped and cleaned."
+  :group 'org-export-qmd
+  :type 'number)
+
 (defcustom ox-qmd-upload-inline-image-no-ask nil
   "Flag if operations are performed without prompt."
   :group 'org-export-qmd
@@ -317,13 +324,34 @@ ORG-BUFFER is a buffer object or buffer name."
                                   (replace-match updated-url nil nil nil 1)
                                 (goto-char (point-max))
                                 (insert "\n# ox-qmd-upload-inline-image: "
-                                        updated-url)))))))))))
-        (make-thread
-         (lambda ()
-           (with-mutex mutex
-             (while (not cond-notified)
-               (condition-wait cond-var)))
-           (funcall pop-stack-and-insert-to-buffer)))))))
+                                        updated-url))))))))))
+             (timer nil)
+             (thread (make-thread
+                      (lambda ()
+                        (with-mutex mutex
+                          (while (not cond-notified)
+                            (condition-wait cond-var)))
+                        (if (timerp timer)
+                            (cancel-timer timer))
+                        (funcall pop-stack-and-insert-to-buffer)))))
+        (setq timer
+              (run-with-timer
+               ox-qmd-upload-inline-image-time-limit
+               nil
+               (lambda (watcher thread cleaner)
+                 (unwind-protect
+                     (message "Waiting upload results is timed out")
+                   (remove-variable-watcher
+                    'ox-qmd-upload-inline-image--uploaded-stack
+                     watcher)
+                   (funcall cleaner)
+                   (thread-signal thread 'error
+                                  '(Follow up thread for
+                                           ox-qmd-upload-inline-image is
+                                           signald))))
+               watcher
+               thread
+               pop-stack-and-insert-to-buffer))))))
 
 (defun org-qmd--link-suppoting-image-upload (link desc info)
   "Transcode LINK element with support for image upload.

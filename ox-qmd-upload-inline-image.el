@@ -66,6 +66,14 @@ Elements looks like (IMAGE-FILE . UPLOAED-URL).")
   " *#+ *ox-qmd-upload-inline-image: \\(.+\\)"
   "Regexp for detecting url data stored in buffer.")
 
+(defvar ox-qmd-upload-inline-image-team-id nil
+  "Team id for uploading images.
+If the value of this user option is a string, it is regarded
+as team id for uploading images.
+If the value is nil, images are uploaded Qiita.
+Other object is not allowed and may cause signaling error.
+File local variable is useful for per file setting.")
+
 (defcustom ox-qmd-upload-inline-image-access-token nil
   "String representing access token for Qiita.
 Both read and write should be enabled for the token, and
@@ -136,9 +144,11 @@ ORG-BUFFER is a buffer object or buffer name."
             (insert data))
           (read (current-buffer))))))
 
-(defun ox-qmd-upload-inline-image--do-upload (image-file)
+(defun ox-qmd-upload-inline-image--do-upload (image-file &optional team-id)
   "Upload IMAGE-FILE for Qiita.
-IMAGE-FILE is a full path of a image-file to upload."
+IMAGE-FILE is a full path of a image-file to upload.
+If optional argument TEAM-ID is given, upload is performed
+using API of TEAM-ID.  TEAM-ID must be a string."
   (interactive "fImage-File: ")
   (or (file-name-absolute-p image-file)
       (error "File must be full path: %s" image-file))
@@ -155,7 +165,12 @@ IMAGE-FILE is a full path of a image-file to upload."
     (let ((extension (file-name-extension image-file)))
       (unless (member extension '("gif" "jpeg" "jpg" "png" "tiff" "tif"))
         (error "Unsupported file format: %s" extension)))
-    (request "https://qiita.com/api/v2/authenticated_user"
+    (if (and team-id (not (stringp team-id)))
+        (error "Team id must be a string: %s" team-id))
+    (request (format "https://%sqiita.com/api/v2/authenticated_user"
+                     (if (stringp team-id)
+                         team-id
+                       ""))
       :type "GET"
       :headers `(("Authorization" .
                   ,(format "Bearer %s"
@@ -179,7 +194,10 @@ IMAGE-FILE is a full path of a image-file to upload."
                                         (plist-get args :data)))
                              (expt 2.0 20))
                           (format-time-string "%b" (current-time)))))
-             (request "https://qiita.com/api/v2/upload_policies"
+             (request ,(format "https://%sqiita.com/api/v2/upload_policies"
+                               (if (stringp team-id)
+                                   team-id
+                                 ""))
                :type "POST"
                :headers '(("Authorization" .
                            ,(format "Bearer %s"
@@ -303,7 +321,9 @@ ORG-BUFFER is a buffer object or buffer name."
           (message "No inline images are detected"))
       (add-variable-watcher 'ox-qmd-upload-inline-image--uploaded-stack watcher)
       (dolist (path not-uploaded-uniq-path-list)
-        (ox-qmd-upload-inline-image--do-upload path))
+        (ox-qmd-upload-inline-image--do-upload
+         path
+         (buffer-local-value 'ox-qmd-upload-inline-image-team-id org-buffer)))
       (let* ((pop-stack-and-insert-to-buffer
               (lambda ()
                 (let (path-url-alist)

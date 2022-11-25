@@ -104,16 +104,19 @@ ORG-BUFFER is a buffer object or buffer name."
     (save-excursion
       (goto-char 1)
       (let ((match-images))
-        (while
-            (re-search-forward
-             (concat "\\[\\[\\("
-                     "\\(file:\\)?"
-                     "\\(.*\\.\\(gif\\|jpeg\\|jpg\\|png\\|tiff\\|tif\\)\\)"
-                     "\\)\\]\\]")
-             nil t)
-          (push (buffer-substring-no-properties (nth 6 (match-data))
-                                                (nth 7 (match-data)))
-                match-images))
+        (while (re-search-forward
+                (concat "\\[\\[\\("
+                        "\\(file:\\)"
+                        "\\(.*\\.\\(gif\\|jpeg\\|jpg\\|png\\|tiff\\|tif\\)\\)"
+                        "\\|"
+                        "\\(/\\|\\./\\)"
+                        "\\(.*\\.\\(gif\\|jpeg\\|jpg\\|png\\|tiff\\|tif\\)\\)"
+                        "\\)\\]\\]")
+                nil t)
+          (let ((begin (or (nth 6 (match-data)) (nth 2 (match-data))))
+                (end (or (nth 7 (match-data)) (nth 3 (match-data)))))
+            (push (buffer-substring-no-properties begin end)
+                match-images)))
         match-images))))
 
 (defun ox-qmd-upload-inline-image--read-url-data (org-buffer)

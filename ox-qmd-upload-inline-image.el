@@ -455,16 +455,17 @@ channel."
       standard)))
 
 (unless (featurep 'ox-qmd-upload-inline-image)
-  (advice-add 'org-qmd--link :override #'org-qmd--link-suppoting-image-upload)
+  (advice-add 'org-qmd--link :override #'org-qmd--link-suppoting-image-upload))
 
+(let ((entry '(?u "To upload inline images"
+                  (lambda (a s v b)
+                    (ox-qmd-upload-inline-image (current-buffer))))))
   (dolist (backend org-export-registered-backends)
-    (if (eq 'qmd (org-export-backend-name backend))
-        (setf (caddr (org-export-backend-menu backend))
-              (append (caddr (org-export-backend-menu backend))
-                      (list '(?u "To upload inline images"
-                                 (lambda (a s v b)
-                                   (ox-qmd-upload-inline-image
-                                    (current-buffer))))))))))
+  (if (and (eq 'qmd (org-export-backend-name backend))
+           (not (member entry (caddr (org-export-backend-menu backend)))))
+      (setf (caddr (org-export-backend-menu backend))
+            (append (caddr (org-export-backend-menu backend))
+                    (list entry))))))
 
 (provide 'ox-qmd-upload-inline-image)
 

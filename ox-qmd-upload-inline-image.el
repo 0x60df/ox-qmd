@@ -278,7 +278,8 @@ ORG-BUFFER is a buffer object or buffer name."
                                                        buffer-name)))
                                 #'org-mode)))
            (if (eq major-mode #'org-mode)
-               (current-buffer)))))
+               (current-buffer)
+             (error "Must be called with org-mode buffer")))))
   (let* ((image-list (ox-qmd-upload-inline-image--find-inline-images
                       org-buffer))
          (image-path-alist

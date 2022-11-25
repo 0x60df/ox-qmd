@@ -69,9 +69,7 @@ When non-nil, `ox-qmd' do unfill paragraph"
         (?o "To file and open"
             (lambda (a s v b)
               (if a (org-qmd-export-to-markdown t s v)
-                (org-open-file (org-qmd-export-to-markdown nil s v)))))
-        (?s "To temporary buffer from subtree"
-            (lambda (a s v b) (org-qmd-export-as-markdown a t v)))))
+                (org-open-file (org-qmd-export-to-markdown nil s v)))))))
   :translate-alist '((headline . org-qmd--headline)
                      (inner-template . org-qmd--inner-template)
                      (keyword . org--qmd-keyword)

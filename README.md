@@ -53,3 +53,16 @@ by adding following code to your `.emacs` file.
 ```emacs-lisp
 (add-to-list 'ox-qmd-language-keyword-alist '("shell-script" . "sh"))
 ```
+
+## Experimental feature
+
+`ox-qmd` offers experimental feature to upload inline images.
+Please note that this feature may cease to work without notice because it
+depends on non-public API of Qiita.
+To use this feature, load the library,
+
+```emacs-lisp
+(require 'ox-qmd-upload-inline-image)
+```
+
+then the uploading command is added to org-export menu.

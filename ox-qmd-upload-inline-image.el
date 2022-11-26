@@ -7,7 +7,6 @@
 ;; Version: 0.0.1
 ;; Keywords: wp
 ;; URL: https://github.com/0x60df/ox-qmd
-;; Package-Requires: ((emacs "26.2") (ox-qmd "1.0.5") (request "0.3.3") (mimetypes "1.0"))
 
 ;; This file is not part of GNU Emacs.
 

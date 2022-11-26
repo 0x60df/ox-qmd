@@ -7,7 +7,7 @@
 ;; Version: 0.0.1
 ;; Keywords: wp
 ;; URL: https://github.com/0x60df/ox-qmd
-;; Package-Requires: ((emacs "27.1") (ox-qmd "1.0.5") (request "0.3.3") (mimetypes "1.0"))
+;; Package-Requires: ((emacs "26.2") (ox-qmd "1.0.5") (request "0.3.3") (mimetypes "1.0"))
 
 ;; This file is not part of GNU Emacs.
 
@@ -203,9 +203,9 @@ using API of TEAM-ID.  TEAM-ID must be a string."
                            ,(format "Bearer %s"
                                     ox-qmd-upload-inline-image-access-token))
                           ("Content-Type" . "application/json"))
-               :data (json-serialize '((content_type . ,content-type)
-                                       (name . ,name)
-                                       (size . ,size)))
+               :data ,(format
+                       "{\"content_type\":\"%s\",\"name\":\"%s\",\"size\":%d}"
+                       content-type name size)
                :parser 'json-read
                :error (cl-function
                        (lambda (&rest args &key error-thrown &allow-other-keys)

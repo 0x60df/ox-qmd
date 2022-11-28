@@ -35,7 +35,7 @@
 ;; Autoloads for this library are not offered.
 ;; Use (require 'ox-qmd-upload-inline-image) to setup.
 
-;; To upload images, call `ox-qmd-upload-inline-image'.
+;; To upload images, call `ox-qmd--upload-inline-image'.
 ;; It scans buffer and try to upload all detected inline images.
 ;; The command above can also be called via org-mode export menu.
 
@@ -57,15 +57,15 @@
 (require 'request)
 (require 'mimetypes)
 
-(defvar ox-qmd-upload-inline-image--uploaded-stack nil
+(defvar ox-qmd--upload-inline-image--uploaded-stack nil
   "Stack of uploaded images.
 Elements looks like (IMAGE-FILE . UPLOAED-URL).")
 
-(defconst ox-qmd-upload-inline-image--url-data-regexp
+(defconst ox-qmd--upload-inline-image--url-data-regexp
   " *#+ *ox-qmd-upload-inline-image: \\(.+\\)"
   "Regexp for detecting url data stored in buffer.")
 
-(defvar ox-qmd-upload-inline-image-team-id nil
+(defvar ox-qmd--upload-inline-image-team-id nil
   "Team id for uploading images.
 If the value of this user option is a string, it is regarded
 as team id for uploading images.
@@ -73,7 +73,7 @@ If the value is nil, images are uploaded Qiita.
 Other object is not allowed and may cause signaling error.
 File local variable is useful for per file setting.")
 
-(defcustom ox-qmd-upload-inline-image-access-token nil
+(defcustom ox-qmd--upload-inline-image-access-token nil
   "String representing access token for Qiita.
 Both read and write should be enabled for the token, and
 scope of token should cover target service
@@ -81,19 +81,19 @@ Qiita/Qiita Team"
   :group 'org-export-qmd
   :type 'string)
 
-(defcustom ox-qmd-upload-inline-image-time-limit 30.0
+(defcustom ox-qmd--upload-inline-image-time-limit 30.0
   "Time in second to quit handling the results of upload.
 When this time is spent, auxiliary facilities for handling
 the results of upload are stopped and cleaned."
   :group 'org-export-qmd
   :type 'number)
 
-(defcustom ox-qmd-upload-inline-image-no-ask nil
+(defcustom ox-qmd--upload-inline-image-no-ask nil
   "Flag if operations are performed without prompt."
   :group 'org-export-qmd
   :type 'boolean)
 
-(defcustom ox-qmd-upload-inline-image-file-name-as-alt nil
+(defcustom ox-qmd--upload-inline-image-file-name-as-alt nil
   "Flag if file name of inline image is used for alternative text.
 Extension of file name is striped.
 If the value of this option is nil, constant keyword img
@@ -104,7 +104,7 @@ for alternative text."
   :group 'org-export-qmd
   :type 'boolean)
 
-(defun ox-qmd-upload-inline-image--find-inline-images (org-buffer)
+(defun ox-qmd--upload-inline-image--find-inline-images (org-buffer)
   "Return list of inline images of ORG-BUFFER.
 ORG-BUFFER is a buffer object or buffer name."
   (with-current-buffer org-buffer
@@ -126,7 +126,7 @@ ORG-BUFFER is a buffer object or buffer name."
                 match-images)))
         match-images))))
 
-(defun ox-qmd-upload-inline-image--read-url-data (org-buffer)
+(defun ox-qmd--upload-inline-image--read-url-data (org-buffer)
   "Read and return URL data of already uploaded images in ORG-BUFFER.
 ORG-BUFFER is a buffer object or buffer name."
   (let (data)
@@ -134,7 +134,7 @@ ORG-BUFFER is a buffer object or buffer name."
       (save-excursion
         (goto-char 1)
         (if (re-search-forward
-             ox-qmd-upload-inline-image--url-data-regexp nil t)
+             ox-qmd--upload-inline-image--url-data-regexp nil t)
             (setq data (buffer-substring-no-properties (nth 2 (match-data))
                                                    (nth 3 (match-data)))))))
     (if data
@@ -143,7 +143,7 @@ ORG-BUFFER is a buffer object or buffer name."
             (insert data))
           (read (current-buffer))))))
 
-(defun ox-qmd-upload-inline-image--do-upload (image-file &optional team-id)
+(defun ox-qmd--upload-inline-image--do-upload (image-file &optional team-id)
   "Upload IMAGE-FILE for Qiita.
 IMAGE-FILE is a full path of a image-file to upload.
 If optional argument TEAM-ID is given, upload is performed
@@ -173,18 +173,18 @@ using API of TEAM-ID.  TEAM-ID must be a string."
       :type "GET"
       :headers `(("Authorization" .
                   ,(format "Bearer %s"
-                           ox-qmd-upload-inline-image-access-token)))
+                           ox-qmd--upload-inline-image-access-token)))
       :parser 'json-read
       :error (cl-function
               (lambda (&rest args &key error-thrown &allow-other-keys)
                 (message "Failed to get authenticated_user info: %s"
                          error-thrown)
                 ;; to release thread
-                (setq ox-qmd-upload-inline-image--uploaded-stack
-                      ox-qmd-upload-inline-image--uploaded-stack)))
+                (setq ox-qmd--upload-inline-image--uploaded-stack
+                      ox-qmd--upload-inline-image--uploaded-stack)))
       :success
       `(lambda (&rest args)
-         (if (or ox-qmd-upload-inline-image-no-ask
+         (if (or ox-qmd--upload-inline-image-no-ask
                  (y-or-n-p
                   (format "Upload %s [%.2fMB] (/[%.1fMB @%s]) ? "
                           ,name
@@ -200,7 +200,7 @@ using API of TEAM-ID.  TEAM-ID must be a string."
                :type "POST"
                :headers '(("Authorization" .
                            ,(format "Bearer %s"
-                                    ox-qmd-upload-inline-image-access-token))
+                                    ox-qmd--upload-inline-image-access-token))
                           ("Content-Type" . "application/json"))
                :data ,(format
                        "{\"content_type\":\"%s\",\"name\":\"%s\",\"size\":%d}"
@@ -211,8 +211,8 @@ using API of TEAM-ID.  TEAM-ID must be a string."
                          (message "Failed to get upload_policies from Qiita: %s"
                                   error-thrown)
                          ;; to release thread
-                         (setq ox-qmd-upload-inline-image--uploaded-stack
-                               ox-qmd-upload-inline-image--uploaded-stack)))
+                         (setq ox-qmd--upload-inline-image--uploaded-stack
+                               ox-qmd--upload-inline-image--uploaded-stack)))
                :success
                (cl-function
                 (lambda (&key data &allow-other-keys)
@@ -247,22 +247,22 @@ using API of TEAM-ID.  TEAM-ID must be a string."
                                           error-thrown)
                                  ;; to release thread
                                  (setq
-                                  ox-qmd-upload-inline-image--uploaded-stack
-                                  ox-qmd-upload-inline-image--uploaded-stack)))
+                                  ox-qmd--upload-inline-image--uploaded-stack
+                                  ox-qmd--upload-inline-image--uploaded-stack)))
                               :success
                               `(lambda (&rest args)
                                  (push
                                   (cons ,,image-file ,download-url)
-                                  ox-qmd-upload-inline-image--uploaded-stack)
+                                  ox-qmd--upload-inline-image--uploaded-stack)
                                  (message "Image successfully upload: %s"
                                           ,download-url))))
                         (advice-remove 'request--curl-command-args
                                        prepend-data)))))))
            ;; to release thread
-           (setq ox-qmd-upload-inline-image--uploaded-stack
-                 ox-qmd-upload-inline-image--uploaded-stack))))))
+           (setq ox-qmd--upload-inline-image--uploaded-stack
+                 ox-qmd--upload-inline-image--uploaded-stack))))))
 
-(defun ox-qmd-upload-inline-image (org-buffer)
+(defun ox-qmd--upload-inline-image (org-buffer)
   "Upload inline images in ORG-BUFFER.
 ORG-BUFFER is a buffer object or buffer name."
   (interactive
@@ -279,7 +279,7 @@ ORG-BUFFER is a buffer object or buffer name."
            (if (eq major-mode #'org-mode)
                (current-buffer)
              (error "Must be called with org-mode buffer")))))
-  (let* ((image-list (ox-qmd-upload-inline-image--find-inline-images
+  (let* ((image-list (ox-qmd--upload-inline-image--find-inline-images
                       org-buffer))
          (image-path-alist
           (mapcar (lambda (image)
@@ -287,7 +287,7 @@ ORG-BUFFER is a buffer object or buffer name."
                           (with-current-buffer org-buffer
                             (expand-file-name image))))
                   image-list))
-         (existing-url-alist (ox-qmd-upload-inline-image--read-url-data
+         (existing-url-alist (ox-qmd--upload-inline-image--read-url-data
                               org-buffer))
          (not-uploaded-uniq-path-list
           (seq-uniq
@@ -313,30 +313,31 @@ ORG-BUFFER is a buffer object or buffer name."
                           (setq cond-notified t)
                           (condition-notify cond-var))
                       (remove-variable-watcher
-                       'ox-qmd-upload-inline-image--uploaded-stack watcher))
+                       'ox-qmd--upload-inline-image--uploaded-stack watcher))
                   (setq watcher-counter (1+ watcher-counter))))))
     (if (null not-uploaded-uniq-path-list)
         (if image-list
             (message "All inline images have already been uploaded")
           (message "No inline images are detected"))
-      (add-variable-watcher 'ox-qmd-upload-inline-image--uploaded-stack watcher)
+      (add-variable-watcher 'ox-qmd--upload-inline-image--uploaded-stack
+                            watcher)
       (dolist (path not-uploaded-uniq-path-list)
-        (ox-qmd-upload-inline-image--do-upload
+        (ox-qmd--upload-inline-image--do-upload
          path
-         (buffer-local-value 'ox-qmd-upload-inline-image-team-id org-buffer)))
+         (buffer-local-value 'ox-qmd--upload-inline-image-team-id org-buffer)))
       (let* ((pop-stack-and-insert-to-buffer
               (lambda ()
                 (let (path-url-alist)
                   (dolist (path not-uploaded-uniq-path-list)
                     (let ((cell
                            (assoc path
-                                  ox-qmd-upload-inline-image--uploaded-stack)))
+                                  ox-qmd--upload-inline-image--uploaded-stack)))
                       (when cell
                         (push cell path-url-alist)
-                        (setq ox-qmd-upload-inline-image--uploaded-stack
+                        (setq ox-qmd--upload-inline-image--uploaded-stack
                               (assoc-delete-all
                                path
-                               ox-qmd-upload-inline-image--uploaded-stack)))))
+                               ox-qmd--upload-inline-image--uploaded-stack)))))
                   (setq path-url-alist (reverse path-url-alist))
                   (let ((image-url-alist
                          (mapcar (lambda (image-path)
@@ -356,7 +357,7 @@ ORG-BUFFER is a buffer object or buffer name."
                                     (append existing-url-alist
                                             image-url-alist))))
                               (if (re-search-forward
-                                   ox-qmd-upload-inline-image--url-data-regexp
+                                   ox-qmd--upload-inline-image--url-data-regexp
                                    nil t)
                                   (replace-match updated-url nil t nil 1)
                                 (goto-char (point-max))
@@ -373,24 +374,24 @@ ORG-BUFFER is a buffer object or buffer name."
                         (funcall pop-stack-and-insert-to-buffer)))))
         (setq timer
               (run-with-timer
-               ox-qmd-upload-inline-image-time-limit
+               ox-qmd--upload-inline-image-time-limit
                nil
                (lambda (watcher thread cleaner)
                  (unwind-protect
                      (message "Waiting upload results is timed out")
                    (remove-variable-watcher
-                    'ox-qmd-upload-inline-image--uploaded-stack
+                    'ox-qmd--upload-inline-image--uploaded-stack
                      watcher)
                    (funcall cleaner)
                    (thread-signal thread 'error
                                   '(Follow up thread for
-                                           ox-qmd-upload-inline-image is
+                                           ox-qmd--upload-inline-image is
                                            signald))))
                watcher
                thread
                pop-stack-and-insert-to-buffer))))))
 
-(defun ox-qmd-upload-inline-image-cleanup-url (org-buffer)
+(defun ox-qmd--upload-inline-image-cleanup-url (org-buffer)
   "Cleanup URL of which local image link does not exist on ORG-BUFFER."
   (interactive
    (list (if current-prefix-arg
@@ -405,10 +406,10 @@ ORG-BUFFER is a buffer object or buffer name."
                                 #'org-mode)))
            (if (eq major-mode #'org-mode)
                (current-buffer)))))
-  (let* ((existing-url-alist (ox-qmd-upload-inline-image--read-url-data
+  (let* ((existing-url-alist (ox-qmd--upload-inline-image--read-url-data
                               org-buffer))
-         (existing-inline-images (ox-qmd-upload-inline-image--find-inline-images
-                                  org-buffer))
+         (existing-inline-images
+          (ox-qmd--upload-inline-image--find-inline-images org-buffer))
          (valid-url-alist (seq-filter (lambda (image-url)
                                         (member (car image-url)
                                                 existing-inline-images))
@@ -418,7 +419,7 @@ ORG-BUFFER is a buffer object or buffer name."
           (save-excursion
             (goto-char 1)
             (if (re-search-forward
-                 ox-qmd-upload-inline-image--url-data-regexp nil t)
+                 ox-qmd--upload-inline-image--url-data-regexp nil t)
                 (replace-match (prin1-to-string valid-url-alist)
                                nil t nil 1)))))))
 
@@ -429,7 +430,7 @@ channel."
   (let ((standard (org-md-link link desc info)))
     (if (org-export-inline-image-p link org-html-inline-image-rules)
         (let* ((uploaded (copy-sequence standard))
-               (url-data (ox-qmd-upload-inline-image--read-url-data
+               (url-data (ox-qmd--upload-inline-image--read-url-data
                           (plist-get info :input-buffer)))
                (regexp "!\\[\\(img\\)\\](\\(.+?\\)\\( .*\\)?)")
                (image (progn
@@ -445,7 +446,7 @@ channel."
               (let ((replaced (replace-match url nil t uploaded 2)))
                 (if (stringp alt)
                     (replace-match alt nil t replaced 1)
-                  (if ox-qmd-upload-inline-image-file-name-as-alt
+                  (if ox-qmd--upload-inline-image-file-name-as-alt
                       (replace-match
                        (file-name-sans-extension
                         (file-name-nondirectory image))
@@ -459,7 +460,7 @@ channel."
 
 (let ((entry '(?u "To upload inline images"
                   (lambda (a s v b)
-                    (ox-qmd-upload-inline-image (current-buffer))))))
+                    (ox-qmd--upload-inline-image (current-buffer))))))
   (dolist (backend org-export-registered-backends)
   (if (and (eq 'qmd (org-export-backend-name backend))
            (not (member entry (caddr (org-export-backend-menu backend)))))

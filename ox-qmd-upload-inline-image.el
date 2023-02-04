@@ -168,7 +168,7 @@ using API of TEAM-ID.  TEAM-ID must be a string."
         (error "Team id must be a string: %s" team-id))
     (request (format "https://%sqiita.com/api/v2/authenticated_user"
                      (if (stringp team-id)
-                         team-id
+                         (format "%s." team-id)
                        ""))
       :type "GET"
       :headers `(("Authorization" .
@@ -195,7 +195,7 @@ using API of TEAM-ID.  TEAM-ID must be a string."
                           (format-time-string "%b" (current-time)))))
              (request ,(format "https://%sqiita.com/api/v2/upload_policies"
                                (if (stringp team-id)
-                                   team-id
+                                   (format "%s." team-id)
                                  ""))
                :type "POST"
                :headers '(("Authorization" .

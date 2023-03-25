@@ -4,8 +4,8 @@
 
 ;; Author: 0x60DF <0x60DF@gmail.com>
 ;; URL: https://github.com/0x60df/ox-qmd
-;; Version: 1.0.5
-;; Package-Requires: ((emacs "26.2") (request "0.3.3") (mimetypes "1.0"))
+;; Version: 1.0.6
+;; Package-Requires: ((emacs "27.2") (request "0.3.3") (mimetypes "1.0"))
 ;; Keywords: wp
 
 ;; This file is not part of GNU Emacs.

@@ -71,6 +71,7 @@ When non-nil, `ox-qmd' do unfill paragraph"
               (if a (org-qmd-export-to-markdown t s v)
                 (org-open-file (org-qmd-export-to-markdown nil s v)))))))
   :translate-alist '((headline . org-qmd--headline)
+                     (item . org-qmd--item)
                      (inner-template . org-qmd--inner-template)
                      (keyword . org--qmd-keyword)
                      (strike-through . org-qmd--strike-through)
@@ -110,6 +111,14 @@ as a communication channel."
   (let* ((info (copy-sequence info))
          (info (plist-put info :with-toc nil)))
     (org-md-headline headline contents info)))
+
+
+(defun org-qmd--item (item contents info)
+  "Transcode ITEM element into Qiita Markdown format.
+CONTENTS is the item contents.  INFO is a plist used as
+a communication channel."
+  (let ((s (org-md-item item contents info)))
+    (replace-regexp-in-string "^\\([-+*] +\\)\\[X\\] " "\\1[x] " s)))
 
 
 (defun org-qmd--inner-template (contents info)

@@ -118,7 +118,7 @@ as a communication channel."
 CONTENTS is the item contents.  INFO is a plist used as
 a communication channel."
   (let ((s (org-md-item item contents info)))
-    (replace-regexp-in-string "^- +\\[X\\]" "- [x]" s)))
+    (replace-regexp-in-string "^\\([-+*] +\\)\\[X\\] " "\\1[x] " s)))
 
 
 (defun org-qmd--inner-template (contents info)

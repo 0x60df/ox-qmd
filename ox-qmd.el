@@ -1,6 +1,6 @@
 ;;; ox-qmd.el --- Qiita Markdown Back-End for Org Export Engine -*- lexical-binding: t -*-
 
-;; Copyright (C) 2015, 2016, 2017, 2020, 2021 0x60DF and Contributors
+;; Copyright (C) 2015, 2016, 2017, 2020, 2021, 2025, 2026 0x60DF and Contributors
 
 ;; Author: 0x60DF <0x60DF@gmail.com>
 ;; URL: https://github.com/0x60df/ox-qmd
